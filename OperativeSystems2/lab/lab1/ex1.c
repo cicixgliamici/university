@@ -1,4 +1,4 @@
-//  !! GIVEN EXAMPLE FROM UNIVERSITY !!
+//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
 
 #include <pthread.h>
 #include <stdio.h>
