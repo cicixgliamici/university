@@ -1,3 +1,5 @@
+//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
