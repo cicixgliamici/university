@@ -1,3 +1,7 @@
+/* Mutex: Protegge l'accesso condiviso ai dati del parco.
+*  Semaforo: Coordina i thread che devono aspettare condizioni specifiche (es. posti o mezzi disponibili).
+*  Threading: Ogni visitatore è rappresentato da un thread che opera in modo indipendente, ma coordinato dalle strutture di sincronizzazione.
+*/
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -34,18 +38,18 @@ void init(parco *p) {
 	p->posti_liberi=MaxP;
 	p->bici_libere=MaxB;
 	p->mono_liberi=MaxM;
-	sem_init(&(p->S),0,0); //sem. condizione --> v.i.0
+	sem_init(&(p->S),0,0);        //Inizializza il semaforo con valore iniziale 0
 	p->sospesi=0;
 	pthread_mutex_init(&p->m, NULL);
 }
 
 void entra(parco *p, int mezzo) {
-	pthread_mutex_lock(&p->m);
+	pthread_mutex_lock(&p->m);     //Blocca il mutex per accedere ai dati condivisi
 	if (mezzo==BICI) {
 		while(p->posti_liberi==0 || p->bici_libere==0 ) {
 			p->sospesi++;
 			pthread_mutex_unlock(&p->m);
-			sem_wait(&(p->S)); // sospensione sul semaforo condizione
+			sem_wait(&(p->S));                          //Aspetta sul semaforo
 			pthread_mutex_lock(&p->m);
 			p->sospesi--;
 		}
@@ -56,14 +60,14 @@ void entra(parco *p, int mezzo) {
 		while(p->posti_liberi==0 || p->mono_liberi==0 ) {
 			p->sospesi++;
 			pthread_mutex_unlock(&p->m);
-			sem_wait(&(p->S)); // sospensione sul semaforo condizione
+			sem_wait(&(p->S));                         //Aspetta sul semaforo
 			pthread_mutex_lock(&p->m);
 			p->sospesi--;
 		}
 		p->posti_liberi--;
 		p->mono_liberi--;
 	}
-	pthread_mutex_unlock (&p->m);
+	pthread_mutex_unlock (&p->m);                             //Rilascia il mutex dopo aver aggiornato lo stato
 }
 
 void esci(parco *p, int mezzo)
@@ -74,16 +78,17 @@ void esci(parco *p, int mezzo)
 		p->bici_libere++;
 	else
 		p->mono_liberi++;
-	for (i=0; i<p->sospesi; i++)
-		sem_post(&p->S); // risveglio tutti
+	for (i=0; i<p->sospesi; i++)               //Risveglia tutti i visitatori in attesa
+		sem_post(&p->S); 
 	pthread_mutex_unlock (&p->m);
 }
 
-void *visitatore(void *t) { // gruppo visitatore-> t C( il numero di componenti
+//Funzione eseguita da ciascun thread (visitatore)
+void *visitatore(void *t) { 
 	int mezzo;
 	int TH=(int)t;
 	mezzo=rand()%2;
-	entra(&P, mezzo); // richiesta entrata con un mezzo scelto casualmente (0/1)
+	entra(&P, mezzo);    //Scelta casuale del mezzo (0 = bici, 1 = monopattino)
 	printf("entrato il visitatore n. %d con mezzo %d (0 bici, 1 monopattino)\n\n", TH, mezzo);
 	sleep(rand()%3);
 	esci(&P,mezzo);
