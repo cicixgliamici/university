@@ -1,7 +1,9 @@
-/* Mutex: Protegge l'accesso condiviso ai dati del parco.
-*  Semaforo: Coordina i thread che devono aspettare condizioni specifiche (es. posti o mezzi disponibili).
-*  Threading: Ogni visitatore è rappresentato da un thread che opera in modo indipendente, ma coordinato dalle strutture di sincronizzazione.
+//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
+/* Mutex: Protects shared access to the park's data. 
+* Semaphore: Coordinates threads that need to wait for specific conditions (e.g., available spots or vehicles).
+* Threading: Each visitor is represented by a thread that operates independently but is coordinated through synchronization mechanisms.
 */
+
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
