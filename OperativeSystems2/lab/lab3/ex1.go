@@ -24,63 +24,63 @@ const MAXRES = 5
    Data Sharing: They allow safe and structured data sharing between goroutines.
    Concurrency Simplification: Channels reduce the complexity of managing locks or shared memory.
 */
-var richiesta = make(chan int)        // Channel to request a resource
-var rilascio = make(chan int)         // Channel to release a resource
-var risorsa [MAXPROC]chan int         // Array of channels for each client to receive resource allocation
-var done = make(chan int)             // Channel to signal when a client finishes
-var termina = make(chan int)          // Channel to signal server termination
+var richiesta = make(chan int)        //Channel to request a resource
+var rilascio = make(chan int)         //Channel to release a resource
+var risorsa [MAXPROC]chan int         //Array of channels for each client to receive resource allocation
+var done = make(chan int)             //Channel to signal when a client finishes
+var termina = make(chan int)          //Channel to signal server termination
 
-// Function executed by each client
+//Function executed by each client
 func client(i int) {
-	richiesta <- i                      // Client requests a resource by sending its ID
-	r := <-risorsa[i]                   // Wait for the server to allocate a resource
+	richiesta <- i                      //Client requests a resource by sending its ID
+	r := <-risorsa[i]                   //Wait for the server to allocate a resource
 	fmt.Printf("\n [client %d] using resource %d\n", i, r)
-	timeout := rand.Intn(3)             // Simulate resource usage time (0-2 seconds)
+	timeout := rand.Intn(3)             //Simulate resource usage time (0-2 seconds)
 	time.Sleep(time.Duration(timeout) * time.Second)
-	rilascio <- r                       // Release the resource after usage
-	done <- i                           // Notify main that the client has finished
+	rilascio <- r                       //Release the resource after usage
+	done <- i                           //Notify main that the client has finished
 }
 
 // Server function to manage resource allocation and release
 func server(nris int, nproc int) {
-	var disponibili int = nris           // Number of available resources
+	var disponibili int = nris           
 	var res, p, i int
-	var libera [MAXRES]bool              // Tracks whether each resource is free
-	var sospesi [MAXPROC]bool            // Tracks whether each client is waiting for a resource
-	var nsosp int = 0                    // Number of clients waiting for resources
-	for i := 0; i < nris; i++ {          // Initialize all resources as free
+	var libera [MAXRES]bool              //Tracks whether each resource is free
+	var sospesi [MAXPROC]bool            //Tracks whether each client is waiting for a resource
+	var nsosp int = 0                    //Number of clients waiting for resources
+	for i := 0; i < nris; i++ {          //Initialize all resources as free
 		libera[i] = true
 	}
-	for i := 0; i < nproc; i++ {        // Initialize all clients as not waiting
+	for i := 0; i < nproc; i++ {         //Initialize all clients as not waiting
 		sospesi[i] = false
 	}
 	for {
-		time.Sleep(time.Second * 1)       // Simulate periodic server processing
+		time.Sleep(time.Second * 1)      
 		fmt.Println("new server cycle")
 		select {
 		// Handle resource release
 		case res = <-rilascio:
-			if nsosp == 0 {               // No clients are waiting
+			if nsosp == 0 {                   //No clients are waiting
 				disponibili++
-				libera[res] = true        // Mark the resource as free
+				libera[res] = true        //Mark the resource as free
 				fmt.Printf("[server] resource %d returned\n", res)
-			} else {                      // Allocate resource to a waiting client
+			} else {                          //Allocate resource to a waiting client
 				for i = 0; i < nproc && !sospesi[i]; i++ {
 				}
-				sospesi[i] = false        // Remove client from waiting list
+				sospesi[i] = false        //Remove client from waiting list
 				nsosp--
-				risorsa[i] <- res         // Assign resource to the client
+				risorsa[i] <- res         //Assign resource to the client
 			}
 		// Handle resource requests
 		case p = <-richiesta:
-			if disponibili > 0 {          // Resources are available
+			if disponibili > 0 {             //Resources are available
 				for i = 0; i < nris && !libera[i]; i++ {
 				}
-				libera[i] = false         // Mark the resource as allocated
+				libera[i] = false        //Mark the resource as allocated
 				disponibili--
-				risorsa[p] <- i           // Send the resource to the client
+				risorsa[p] <- i          //Send the resource to the client
 				fmt.Printf("[server] allocated resource %d to client %d\n", i, p)
-			} else {                      // No resources available; client waits
+			} else {                         //No resources available; client waits
 				nsosp++
 				sospesi[p] = true
 				fmt.Printf("[server] client %d is waiting..\n", p)
