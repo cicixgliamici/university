@@ -36,7 +36,7 @@ func when(b bool, c chan int) chan int {
 	if !b {
 		return nil                   //Disables the channel if the condition is false
 	}
-	return c                       //Returns the original channel if the condition is true
+	return c                             //Returns the original channel if the condition is true
 }
 
 /* The <- operator is used for channel communication.
@@ -53,9 +53,9 @@ func client(i int) {
 }
 
 func server(nris int) {
-	var disponibili int = nris     //Number of available resources
-	var res, p, i int              //Temporary variables for resource index, client ID, etc.
-	var libera [MAXRES]bool        //Tracks whether each resource is available
+	var disponibili int = nris           //Number of available resources
+	var res, p, i int                    //Temporary variables for resource index, client ID, etc.
+	var libera [MAXRES]bool              //Tracks whether each resource is available
 	for i := 0; i < nris; i++ {
 		libera[i] = true             //Initialize all resources as available
 	}
@@ -63,25 +63,24 @@ func server(nris int) {
 		time.Sleep(time.Second * 1) 
 		fmt.Println("nuovo ciclo server")
 		select {
-    		case res = <-rilascio:                                             //Resource release
-    			disponibili++
-    			libera[res] = true
-    			fmt.Printf("[server]  restituita risorsa: %d  \n", res)
-    		case p = <-when(disponibili > 0, richiesta):                       //Handle resource request if available
-    			for i = 0; i < nris && !libera[i]; i++ {
-    			}
-    			libera[i] = false
-    			disponibili--
-    			risorsa[p] <- i                                                 //Allocate resource to client
-    			fmt.Printf("[server]  allocata risorsa %d a cliente %d \n", i, p)
-    		case <-termina:                                                   //Terminate when signaled
-    			fmt.Println("FINE !!!!!!")
-    			done <- 1                                                       //Notify main thread of server completion
-    			return
-		}
+	    		case res = <-rilascio:                                             //Resource release
+	    			disponibili++
+	    			libera[res] = true
+	    			fmt.Printf("[server]  restituita risorsa: %d  \n", res)
+	    		case p = <-when(disponibili > 0, richiesta):                       //Handle resource request if available
+	    			for i = 0; i < nris && !libera[i]; i++ {
+	    			}
+	    			libera[i] = false
+	    			disponibili--
+	    			risorsa[p] <- i                                            //Allocate resource to client
+	    			fmt.Printf("[server]  allocata risorsa %d a cliente %d \n", i, p)
+	    		case <-termina:                                                    //Terminate when signaled
+	    			fmt.Println("FINE")
+	    			done <- 1                                                  //Notify main thread of server completion
+	    			return
+			}
 	}
 }
-
 
 func main() {
 	var cli, res int
@@ -91,7 +90,7 @@ func main() {
 	fmt.Printf("\n quante risorse (max %d)? ", MAXRES)
 	fmt.Scanf("%d", &res)
 	fmt.Println("risorse da gestire:", res)
-  // Initialize client-specific channels
+        // Initialize client-specific channels
 	for i := 0; i < MAXPROC; i++ {
 		risorsa[i] = make(chan int)
 	}
