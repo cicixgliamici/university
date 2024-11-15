@@ -1,5 +1,21 @@
-// pool di risorse equivalenti con guardie logiche
-
+//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
+/*
+1. Goroutines:
+   - Lightweight threads managed by the Go runtime. 
+   - Used to implement concurrency in this program. The `client` and `server` functions are run as goroutines to execute concurrently.
+ 2. Channels:
+   - Provide a way for goroutines to communicate and synchronize by passing data.
+3. Select Statement:
+   - Used to wait on multiple channel operations simultaneously.
+   - The `select` in the `server` function monitors the following:
+     - Resource release (`rilascio`).
+     - Resource requests (`richiesta`), conditioned by availability (`when` function).
+     - Termination signal (`termina`).
+4. Logical Guards (`when` function):
+   - Implements conditional channel enabling. If the condition (availability of resources) is false, the channel becomes `nil` and is ignored in the `select` statement.
+5. Concurrency Synchronization:
+   - Channels (`done` and `termina`) are used to synchronize the completion of goroutines and the termination of the server.
+*/
 package main
 
 import (
