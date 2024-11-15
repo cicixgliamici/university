@@ -11,17 +11,17 @@
 #define K 2
 
 typedef struct{
-int voti[K];
-char film[K][40];
-int pareri;
-int indiceVincitore;
-pthread_mutex_t m;
+	int voti[K];
+	char film[K][40];
+	int pareri;
+	int indiceVincitore;
+	pthread_mutex_t m;
 } sondaggio;
 
 typedef struct {
-int completati;
-sem_t mb;           
-sem_t barriera;     
+	int completati;
+	sem_t mb;           
+	sem_t barriera;     
 }barriera_sincro;
 
 sondaggio S;
