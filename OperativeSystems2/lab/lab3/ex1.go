@@ -1,3 +1,4 @@
+//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
 /* Purpose: This program simulates a pool of equivalent resources managed by a server. 
             Clients (goroutines) request resources, use them, and release them. 
 	    The server handles allocation and release of resources.
