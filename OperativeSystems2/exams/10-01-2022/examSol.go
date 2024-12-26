@@ -89,7 +89,7 @@ func AR(id int) {
 			fmt.Printf("[Worker %d] requesting a surgical mask batch\n", id)
 		}
 		startwithdrawal[tipo] <- r
-		<-r.ack
+		<-r.ack                                                                     //Waiting for the acknowledgement 
 		sleep(10)                                                                   //Time to process the withdrawal
 		endwithdrawal <- r                                                          //Notify end of withdrawal
 		<-r.ack
