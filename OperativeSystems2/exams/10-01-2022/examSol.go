@@ -76,12 +76,12 @@ func when(condition bool, c chan request) chan request {
 // The function handles the worker's withdrawal process over multiple cycles until completion.
 // Each withdrawal includes synchronization with the warehouse to ensure constraints are met.
 func AR(id int) { 
-	tipo := rand.Intn(3)                                                          //0 for mixed masks, 1 for FFP2 masks, 2 for surgical masks
+	tipo := rand.Intn(3)                                                        
 	r := request{id, tipo, make(chan int)}
 	sleep(10)
 	cycles := rand.Intn(MAXCYCLES) + 1
 	for i := 0; i < cycles; i++ {                                               
-		tipo := rand.Intn(3)                                                        //0 for mixed masks, 1 for FFP2 masks, 2 for surgical masks
+		tipo := rand.Intn(3)                                                      
 		r.tipo = tipo
 		if tipo == T_MIX {
 			fmt.Printf("[Worker %d] requesting a mixed batch\n", id)
