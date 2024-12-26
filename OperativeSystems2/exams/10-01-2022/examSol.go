@@ -144,7 +144,7 @@ func warehouse() {
 
 	for {
 		select {
-
+		//It works like: if the condition (first argument in the when) it's true, look at the channel and see if there is something, like an ack or a valure
 		case x := <-when(surgicalMasks >= BMM && ffp2Masks >= BMM && suppliersInSurgical == 0 && suppliersInFFP2 == 0, startwithdrawal[T_MIX]):
 			workersInSurgical++
 			workersInFFP2++
