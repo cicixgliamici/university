@@ -26,7 +26,9 @@ const (
 )
 
 //Channels for synchronization and communication
-//Syntax:     reader <- sender
+//General syntax:                             reader <- sender
+//Waiting ack (no interest for the data):     <- sender
+//Saving the information:                     variable (may be another channel) <- sender
 var (
 	doneTask            =make(chan bool)           //Signals task completion
 	doneWarehouse       =make(chan bool)           //Signals warehouse shutdown
