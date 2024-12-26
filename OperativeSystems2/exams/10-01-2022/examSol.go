@@ -77,7 +77,7 @@ func AR(id int) {
 	r := request{id, tipo, make(chan int)}
 	sleep(10)
 	cycles := rand.Intn(MAXCYCLES) + 1
-	for i := 0; i < cycles; i++ {                                                 //Withdrawal cycles
+	for i := 0; i < cycles; i++ {                                               
 		tipo := rand.Intn(3)                                                        //0 for mixed masks, 1 for FFP2 masks, 2 for surgical masks
 		r.tipo = tipo
 		if tipo == T_MIX {
@@ -105,7 +105,7 @@ func AR(id int) {
 // The function also handles termination signals to stop the supplier's activity.
 func supplier(tipo int) { 
 	r := request{tipo, tipo, make(chan int)}
-	for {                                                                                 //Supply cycles
+	for {                                                                                
 		sleep(5)
 		fmt.Printf("[Supplier %d] requesting restock for mask type %d\n", tipo, tipo)
 		startDelivery[tipo] <- r
