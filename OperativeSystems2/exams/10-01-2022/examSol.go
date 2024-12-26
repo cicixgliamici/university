@@ -12,7 +12,8 @@ const (
 	MAXCYCLES     =3    //Maximum number of work cycles per worker
 	SSM           =10   //Shelf capacity for surgical masks
 	SFFP2         =10   //Shelf capacity for FFP2 masks
-  BSM           =3    //Batch size for surgical masks
+	
+        BSM           =3    //Batch size for surgical masks
 	BFFP2         =4    //Batch size for FFP2 masks
 	BMM           =2    //Batch size for mixed masks
 
