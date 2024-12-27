@@ -6,6 +6,6 @@ This repository contains a collection of codes and projects related to my univer
 
 Below is the structure to include an index of the repository. You can update it as you add or modify files.
 
-- [Operating Systems 2 ](#system-programming)
+- [Operating Systems 2]
   - [Laboratory](https://github.com/cicixgliamici/university/tree/main/OperativeSystems2/lab)
   - [Exams](https://github.com/cicixgliamici/university/tree/main/OperativeSystems2/exams)
