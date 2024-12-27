@@ -9,33 +9,33 @@ import (
 const MAX_BUFFER = 100
 const MAX_CLIENTS = 100
 
-const SmallBottle = 0 // 0.5 liters, price 0.10
-const LargeBottle = 1 // 1.5 liters, price 0.20
+const SmallBottle = 0 		//0.5 liters, price 0.10
+const LargeBottle = 1 		//1.5 liters, price 0.20
 
-const CapacitySmall = 0.5 // capacity of a small bottle
-const CapacityLarge = 1.5 // capacity of a large bottle
+const CapacitySmall = 0.5 	//capacity of a small bottle
+const CapacityLarge = 1.5 	//capacity of a large bottle
 
-const TankCapacity = 50.0 // tank capacity (liters)
+const TankCapacity = 50.0 	//tank capacity (liters)
 
-const SmallCoinsBox = 0 // box for 10-cent coins
-const LargeCoinsBox = 1 // box for 20-cent coins
+const SmallCoinsBox = 0 	//box for 10-cent coins
+const LargeCoinsBox = 1 	//box for 20-cent coins
 
-const MaxSmallCoins = 15 // max number of 10-cent coins
-const MaxLargeCoins = 20 // max number of 20-cent coins
+const MaxSmallCoins = 15	//max number of 10-cent coins
+const MaxLargeCoins = 20 	//max number of 20-cent coins
 
-// channels for clients
-var start_request [2]chan request
-var end_request = make(chan request, MAX_BUFFER)
+//Array and buffered channels for clients
+var start_request   [2]chan request
+var end_request     =make(chan request, MAX_BUFFER)
 
-// channels for the operator
-var start_refill = make(chan int, MAX_BUFFER)
-var end_refill = make(chan int, MAX_BUFFER)
-var ack_operator = make(chan int, MAX_BUFFER)
+//Buffered channels for the operator
+var start_refill    =make(chan int, MAX_BUFFER)
+var end_refill      =make(chan int, MAX_BUFFER)
+var ack_operator    =make(chan int, MAX_BUFFER)
 
-// termination channels
-var done = make(chan bool)
-var terminate = make(chan bool)
-var terminateOperator = make(chan bool)
+//Unbuffered termination channels
+var done              =make(chan bool)
+var terminate         =make(chan bool)
+var terminateOperator =make(chan bool)
 
 type request struct {
 	index int
