@@ -7,10 +7,10 @@ import (
 )
 
 // General constants
-const NUM_OFFICES = 5  // Number of offices (consultants)
-const MAX_WAITING_ROOM = 10 // Capacity of the waiting room
-const NUM_USERS = 100  // Total number of users
-const MAX_BUFFER = 50  // Buffer size for channels
+const NUM_OFFICES = 5        // Number of offices (consultants)
+const MAX_WAITING_ROOM = 10  // Capacity of the waiting room
+const NUM_USERS = 100        // Total number of users
+const MAX_BUFFER = 50        // Buffer size for channels
 
 // Constants for user priority in the waiting room
 const USER_TYPES = 3
@@ -25,10 +25,10 @@ const OTHER = 1          // Other financial services
 
 // Struct to represent user data
 type User struct {
-	id    int      // User ID
-	userType int   // Type of user (administrator, private, etc.)
-	serviceType int // Type of financial service (superbonus, other)
-	reply chan int // Channel for user replies
+	id          int      // User ID
+	userType    int      // Type of user (administrator, private, etc.)
+	serviceType int      // Type of financial service (superbonus, other)
+	reply       chan int // Channel for user replies
 }
 
 // General communication channels
@@ -36,9 +36,9 @@ var terminate chan bool // Channel to signal termination
 var done chan bool      // Channel to signal task completion
 
 // Specific communication channels
-var enterWaitingRoom [USER_TYPES]chan User   // Channels for entering the waiting room by user type
-var enterOffice [FINANCE_TYPES]chan User     // Channels for entering offices based on service type
-var exitOffice chan int                      // Channel for exiting the office
+var enterWaitingRoom [USER_TYPES]chan User // Channels for entering the waiting room by user type
+var enterOffice [FINANCE_TYPES]chan User   // Channels for entering offices based on service type
+var exitOffice chan int                    // Channel for exiting the office
 
 // Utility function: simulate random sleep
 func sleepRandom() {
@@ -70,7 +70,7 @@ func server() {
 			waitingRoomCount += 1
 			fmt.Printf("SERVER: Administrator %d entered the waiting room.\n", request.id)
 			request.reply <- 1 // Notify the client that they entered successfully
-		
+
 		// Case 2: A private individual without an accompanist enters the waiting room
 		case request := <-when(waitingRoomCount < MAX_WAITING_ROOM && len(enterWaitingRoom[ADMIN]) == 0, enterWaitingRoom[PRIVATE_SINGLE]):
 			waitingRoomCount += 1
@@ -142,41 +142,57 @@ func server() {
 }
 
 func user(id int) {
-	// Determine the type of user and financing request
 	userType := rand.Intn(USER_TYPES)   // Administrator, individual, or accompanied
-	financingType := rand.Intn(FIN_TYPES) // Type of financing (e.g., Superbonus or Other)
-	
-	// Create a reply channel for communication
-	var ack = make(chan int)
-	var request descrUtente
+	serviceType := rand.Intn(FINANCE_TYPES) // Type of financing (Superbonus or Other)
 
-	// Populate the request structure
+	var ack = make(chan int)
+	var request User
+
 	request.id = id
-	request.tipoU = userType
-	request.tipoF = financingType
+	request.userType = userType
+	request.serviceType = serviceType
 	request.reply = ack
 
-	// Simulate some random activity time before proceeding
 	sleepRandom()
 
-	// Request to enter the waiting room based on user type
 	enterWaitingRoom[userType] <- request
-	<-request.reply // Wait for acknowledgment from the server
+	<-request.reply
 
-	// Request to enter an office based on financing type
-	enterOffice[financingType] <- request
-	officeAssigned := <-request.reply // Wait for office assignment from the server
+	enterOffice[serviceType] <- request
+	officeAssigned := <-request.reply
 
-	// Simulate some random activity time in the office
 	sleepRandom()
 
-	// Notify the server that the user is leaving the office
 	exitOffice <- officeAssigned
 
-	// Print a message indicating the user has finished
 	fmt.Printf("User [%d]: I have exited office %d. Terminating.\n", id, officeAssigned)
 
-	// Notify the system that the user is done
 	done <- true
-	return
+}
+
+func main() {
+	rand.Seed(time.Now().UnixNano())
+
+	terminate = make(chan bool)
+	done = make(chan bool)
+
+	for i := 0; i < USER_TYPES; i++ {
+		enterWaitingRoom[i] = make(chan User, MAX_BUFFER)
+	}
+	for i := 0; i < FINANCE_TYPES; i++ {
+		enterOffice[i] = make(chan User, MAX_BUFFER)
+	}
+	exitOffice = make(chan int, MAX_BUFFER)
+
+	go server()
+
+	for id := 0; id < NUM_USERS; id++ {
+		go user(id)
+	}
+	for id := 0; id < NUM_USERS; id++ {
+		<-done
+	}
+
+	terminate <- true
+	<-done
 }
