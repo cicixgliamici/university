@@ -16,4 +16,15 @@ Go is a statically typed, compiled programming language designed for simplicity,
 5. **Rich Standard Library**:
    - Provides built-in packages for networking, cryptography, HTTP, and more.
 
----
+## Declaring Variables
+
+In Go, variables can be declared using the `var` keyword or shorthand syntax.
+
+// Using the 'var' keyword
+var message string = "Hello, World!"
+
+// Type inference
+var number = 42
+
+// Shorthand syntax
+count := 10
