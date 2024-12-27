@@ -1,5 +1,3 @@
-//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
-
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,53 +6,66 @@
 #define N 20
 #define K 4
 
-//Given an empty array of N=20 elements, we will divide it in K=4 portions
-//Then we will randomize it and we will create M=N/K=5 threads
-//We will search each maximum in the M set and then find the maximum above all sets
+/*
+ * This program demonstrates the use of pthreads in C for parallel computation.
+ * Pthreads (POSIX threads) are a threading API used to create and manage threads
+ * in C programs. Threads allow tasks to execute concurrently within the same process,
+ * sharing memory space. Here, we divide an array into segments, calculate the local 
+ * maximum of each segment in parallel using threads, and then determine the overall maximum.
+ */
+
+// Array of N=20 elements
 int V[N];
 
-
-void *Calcolo(void *t) {                               //"Worker", the segment where we search the maximum 
-    int first, result=0;
-    first = (int)t;
-    for (int i=first; i<first+K; i++)
-	if (V[i]>result)
-		result=V[i];
+// Thread worker function: finds the maximum element in the segment assigned to the thread
+void *Calcolo(void *t) {                               
+    int first, result = 0; 			//Initialize the result to 0
+    first = (int)t; 				//Starting index of the segment assigned to this thread
+    for (int i = first; i < first + K; i++)     //Iterate over the assigned segment
+        if (V[i] > result)
+            result = V[i]; 			//Update the local maximum
     printf("Local Maximum: %d\n", result); 
-    pthread_exit((void*) result);
-}
-
+    pthread_exit((void*) result); 		//Return the local maximum
+}	
 
 int main (int argc, char *argv[]) {
-    pthread_t thread[N/K];
-    int rc;
-    int M, t, first, status, max=0;
-    M=N/K;	                                      //Number of threads/worker
-    srand(time(0));                                   //Randomize using the seed "time"
+    pthread_t thread[N / K]; 			//Array to store thread identifiers
+    int rc; 					//Return code for thread functions
+    int M, t, first, status, max = 0; 		//Variables for number of threads, thread status, and global maximum
+    M = N / K; 					//Number of threads/workers
+    srand(time(0)); 				//Initialize the random seed with the current time
+    
+    // Initialize the array with random numbers between 1 and 200
     printf("Vector initialization V:\n");
-    for(int i = 0; i < N; i++){
-	   V[i]=1+rand()%200;                         //Random numbers between 1-200
-	   printf("%d\t", V[i]);
-   	}	
+    for (int i = 0; i < N; i++) {
+        V[i] = 1 + rand() % 200; 		//Random numbers between 1-200
+        printf("%d\t", V[i]);
+    }
     printf("\n");
-    for(t=0; t<M; t++) {
+    
+    // Create threads to compute local maxima
+    for (t = 0; t < M; t++) {
         printf("Main: Thread creation n.%d\n", t);
-	first=t*K;                                                       //Giving each thread the index of the first element of the sets they will use
+        first = t * K; 				//Index of the first element in the segment assigned to the thread
         rc = pthread_create(&thread[t], NULL, Calcolo, (void *)first);
-        if (rc) {
+        if (rc) { 				//Check for errors in thread creation
             printf("Error: %d\n", rc);
             exit(-1); 
-	}
+        }
     }
-    for(t=0; t<M; t++) {
+    
+    // Wait for all threads to complete and find the global maximum
+    for (t = 0; t < M; t++) {
         rc = pthread_join(thread[t], (void *)&status);
-	if (rc)
-		printf("ERROR join thread %ld code %d\n", t, rc);
-	else {
-		printf("Finished thread %ld with answer %d\n",t,status);
-		if (status>max)
-			max=status;
-	}
-   }
-   printf("True answer: %d\n", max);
+        if (rc) 				//Check for errors in thread joining
+            printf("ERROR joining thread %ld code %d\n", t, rc);
+        else {
+            printf("Finished thread %ld with answer %d\n", t, status);
+            if (status > max) 			//Update the global maximum if necessary
+                max = status;
+        }
+    }
+    
+    // Print the final global maximum
+    printf("True answer: %d\n", max);
 }
