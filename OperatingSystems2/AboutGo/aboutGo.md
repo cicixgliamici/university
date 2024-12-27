@@ -20,6 +20,7 @@ Go is a statically typed, compiled programming language designed for simplicity,
 
 In Go, variables can be declared using the `var` keyword or shorthand syntax.
 
+```go
 Using the 'var' keyword
 `var message string = "Hello, World!"`
 
