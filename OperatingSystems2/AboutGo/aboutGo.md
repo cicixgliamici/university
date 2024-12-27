@@ -21,11 +21,11 @@ Go is a statically typed, compiled programming language designed for simplicity,
 In Go, variables can be declared using the `var` keyword or shorthand syntax.
 
 ```go
-Using the 'var' keyword
+\\Using the 'var' keyword
 `var message string = "Hello, World!"`
 
-Type inference
+\\Type inference
 `var number = 42`
 
-Shorthand syntax
+\\Shorthand syntax
 `count := 10`
