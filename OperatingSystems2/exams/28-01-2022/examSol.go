@@ -90,7 +90,7 @@ func AR(id int) {
 		} else {
 			fmt.Printf("[Worker %d] requesting a surgical mask batch\n", id)
 		}
-		startwithdrawal[tipo] <- r
+		startwithdrawal[tipo] <- r                                                  //Start a request and wait for the synchronization
 		<-r.ack                                                                     //Waiting for the acknowledgement 
 		sleep(10)                                                                   //Time to process the withdrawal
 		endwithdrawal <- r                                                          //Notify end of withdrawal
@@ -111,8 +111,8 @@ func supplier(tipo int) {
 	for {                                                                                
 		sleep(5)
 		fmt.Printf("[Supplier %d] requesting restock for mask type %d\n", tipo, tipo)
-		startDelivery[tipo] <- r
-		flag := <-r.ack
+		startDelivery[tipo] <- r                                                            //No need for synchronization
+		flag := <-r.ack                                                                     //But need to know if he have to stop
 		sleep(20)                                                                           //Time to restock the shelf
 		if flag == 0 {                                                                      //Supplier needs to terminate
 			doneTask <- true
@@ -218,11 +218,11 @@ func warehouse() {
 	}
 }
 
-// Orchestrates the simulation by launching concurrent processes for the warehouse, workers, and suppliers.
-// Initializes the necessary channels for communication and synchronization.
-// Creates a random number of workers and starts their withdrawal tasks.
-// Waits for all workers and suppliers to complete their operations before signaling the warehouse to terminate.
-// Ensures proper termination of the entire system.
+//Orchestrates the simulation by launching concurrent processes for the warehouse, workers, and suppliers.
+//Initializes the necessary channels for communication and synchronization.
+//Creates a random number of workers and starts their withdrawal tasks.
+//Waits for all workers and suppliers to complete their operations before signaling the warehouse to terminate.
+//Ensures proper termination of the entire system.
 func main() {
 	rand.Seed(time.Now().Unix())
 	for i := 0; i < 2; i++ {
