@@ -12,16 +12,16 @@ const MAX_CLIENTS = 100
 const SmallBottle = 0 		//0.5 liters, price 0.10
 const LargeBottle = 1 		//1.5 liters, price 0.20
 
-const CapacitySmall = 0.5 	//capacity of a small bottle
-const CapacityLarge = 1.5 	//capacity of a large bottle
+const CapacitySmall = 0.5 	//Capacity of a small bottle
+const CapacityLarge = 1.5 	//Capacity of a large bottle
 
-const TankCapacity = 50.0 	//tank capacity (liters)
+const TankCapacity = 50.0 	//Tank capacity (liters)
 
-const SmallCoinsBox = 0 	//box for 10-cent coins
-const LargeCoinsBox = 1 	//box for 20-cent coins
+const SmallCoinsBox = 0 	//Box for 10-cent coins
+const LargeCoinsBox = 1 	//Box for 20-cent coins
 
-const MaxSmallCoins = 15	//max number of 10-cent coins
-const MaxLargeCoins = 20 	//max number of 20-cent coins
+const MaxSmallCoins = 15	//Max number of 10-cent coins
+const MaxLargeCoins = 20 	//Max number of 20-cent coins
 
 //Array and buffered channels for clients
 var start_request   [2]chan request
@@ -36,6 +36,9 @@ var ack_operator    =make(chan int, MAX_BUFFER)
 var done              =make(chan bool)
 var terminate         =make(chan bool)
 var terminateOperator =make(chan bool)
+
+//Unbuffered = no synchronization
+//Buffered   = synchronization
 
 type request struct {
 	index int
@@ -63,29 +66,26 @@ func sleepRandomTime(limit int) {
 	}
 }
 
-// goroutine for clients
+//Goroutine for clients
 func client(index int) {
-	kind := rand.Intn(2) // 0 for small bottle, 1 for large bottle
+	kind := rand.Intn(2)         //0 for small bottle, 1 for large bottle
 	r := request{index, kind, make(chan int)}
-	sleepRandomTime(2) // simulating payment
-
+	sleepRandomTime(2)           //Simulating payment
 	if r.kind == SmallBottle {
 		fmt.Printf("[client %d] requested a small bottle\n", index)
 	} else {
 		fmt.Printf("[client %d] requested a large bottle\n", index)
 	}
-
 	start_request[kind] <- r
 	<-r.ack
-
-	sleepRandomTime(3) // simulating bottle filling
+	sleepRandomTime(3)           //Simulating bottle filling
 	end_request <- r
 	<-r.ack
 	fmt.Printf("[client %d] finished filling my bottle, exiting!\n", index)
 	done <- true
 }
 
-// goroutine for operator
+//Goroutine for operator
 func operator() {
 	var response int
 	sleepRandomTime(4)
@@ -98,7 +98,7 @@ func operator() {
 			return
 		}
 		fmt.Printf("[operator] starting the refill process...\n")
-		sleepRandomTime(3) // time required for refilling
+		sleepRandomTime(3)                                                                //Time required for refilling
 		end_refill <- 1
 		<-ack_operator
 		fmt.Printf("[operator] Refill complete, water station is operational again...\n")
@@ -106,55 +106,68 @@ func operator() {
 	}
 }
 
-// server goroutine
+//Server goroutine
 func waterStation() {
-	var currentWater = TankCapacity // current tank water level
-	var smallCoinCount = 0          // total 10-cent coins in the box
-	var largeCoinCount = 0          // total 20-cent coins in the box
+	var currentWater = TankCapacity  //Current tank water level
+	var smallCoinCount = 0           //Total 10-cent coins in the box
+	var largeCoinCount = 0           //Total 20-cent coins in the box
 	var busy = false
 	var stop = false
 	fmt.Printf("[waterStation] Water station is operational!\n")
 	for {
 		select {
-		// client requesting a small bottle
+			
+		//Client requesting a small bottle
 		case x := <-whenRequest(!busy && currentWater >= CapacitySmall && smallCoinCount < MaxSmallCoins &&
-			(largeCoinCount < MaxLargeCoins || (largeCoinCount == MaxLargeCoins && len(start_refill) == 0)), start_request[SmallBottle]):
+			               (largeCoinCount < MaxLargeCoins || 
+				       (largeCoinCount == MaxLargeCoins && len(start_refill) == 0)), start_request[SmallBottle]):
 			busy = true
 			smallCoinCount++
 			currentWater -= CapacitySmall
 			fmt.Printf("[waterStation] Client %d started filling a bottle of type %d\n", x.index, x.kind)
 			x.ack <- 1
-		// client requesting a large bottle
+			
+		//Client requesting a large bottle
 		case x := <-whenRequest(!busy && currentWater >= CapacityLarge && largeCoinCount < MaxLargeCoins && len(start_request[SmallBottle]) == 0 &&
-			(smallCoinCount < MaxSmallCoins || (smallCoinCount == MaxSmallCoins && len(start_refill) == 0)), start_request[LargeBottle]):
+			               (smallCoinCount < MaxSmallCoins || 
+				       (smallCoinCount == MaxSmallCoins && len(start_refill) == 0)), start_request[LargeBottle]):
 			busy = true
 			largeCoinCount++
 			currentWater -= CapacityLarge
 			fmt.Printf("[waterStation] Client %d started filling a bottle of type %d\n", x.index, x.kind)
 			x.ack <- 1
-		// operator refill process
+			
+		//Operator refill process
 		case <-when(!stop && !busy &&
-			((smallCoinCount == MaxSmallCoins || largeCoinCount == MaxLargeCoins || currentWater == 0) ||
-				(len(start_request[SmallBottle])+len(start_request[LargeBottle]) == 0)), start_refill):
+			   ((smallCoinCount == MaxSmallCoins || largeCoinCount == MaxLargeCoins || currentWater == 0) ||
+			   (len(start_request[SmallBottle])+len(start_request[LargeBottle]) == 0)), start_refill):
 			busy = true
 			currentWater = TankCapacity
 			smallCoinCount = 0
 			largeCoinCount = 0
 			fmt.Printf("[waterStation] Operator started refilling the tank and emptying coin boxes\n")
 			ack_operator <- 1
-		// end of client request
+			
+		//End of client request
 		case x := <-end_request:
 			busy = false
 			x.ack <- 1
+			
+		//End of operator refill
 		case <-end_refill:
 			busy = false
 			ack_operator <- 1
-		// termination
+			
+		//Termination of the operator
 		case <-terminateOperator:
 			stop = true
 			fmt.Printf("[waterStation] All clients served, notifying operator to terminate\n")
+
+		//Termination of the refill
 		case <-when(stop, start_refill):
 			ack_operator <- -1
+
+	        //General termination
 		case <-terminate:
 			fmt.Printf("[waterStation] Shutting down!\n")
 			done <- true
@@ -174,7 +187,6 @@ func main() {
 	go operator()
 	go waterStation()
 	fmt.Printf("\n[MAIN] Water station is open.\n")
-	// waiting for clients to finish
 	for i := 0; i < MAX_CLIENTS; i++ {
 		<-done
 	}
