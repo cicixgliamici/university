@@ -124,7 +124,80 @@ func castle() {
 	fmt.Printf("[castle] The road is open!\n")
 	for {
 		select {
-		// Various cases for vehicle logic
+		case index = <-when((freeMaxiSpots > 0) && (numCampersOnRoad[DOWNHILL]+numCarsOnRoad[DOWNHILL] == 0) && (!snowplowActive) &&
+			(len(startDownhill[CAMPER])+len(startDownhill[CAR])+len(startDownhill[SNOWPLOW]) == 0), startUphill[CAMPER]):
+			freeMaxiSpots--
+			numCampersOnRoad[UPHILL]++
+			fmt.Printf("[castle] CAMPER %d entered uphill direction\n", index)
+			ACK_tourist[index] <- MAXI
+		case index = <-when((freeStandardSpots+freeMaxiSpots > 0) && (numCampersOnRoad[DOWNHILL] == 0) && (!snowplowActive) && (len(startUphill[CAMPER]) == 0) &&
+			(len(startDownhill[CAMPER])+len(startDownhill[CAR])+len(startDownhill[SNOWPLOW]) == 0), startUphill[CAR]):
+			parkingType := -1
+			if freeStandardSpots > 0 {
+				freeStandardSpots--
+				parkingType = STANDARD
+			} else {
+				freeMaxiSpots--
+				parkingType = MAXI
+			}
+			numCarsOnRoad[UPHILL]++
+			fmt.Printf("[castle] CAR %d entered uphill direction\n", index)
+			ACK_tourist[index] <- parkingType
+		case <-when((numCampersOnRoad[DOWNHILL]+numCarsOnRoad[DOWNHILL]+numCampersOnRoad[UPHILL]+numCarsOnRoad[UPHILL] == 0) &&
+			(len(startUphill[CAMPER])+len(startUphill[CAR]) == 0) && (len(startDownhill[CAMPER])+len(startDownhill[CAR]) == 0), startUphill[SNOWPLOW]):
+			snowplowActive = true
+			fmt.Printf("[castle] SNOWPLOW entered uphill direction\n")
+			ACK_snowplow <- 1
+		case index = <-endUphill[CAMPER]:
+			numCampersOnRoad[UPHILL]--
+			fmt.Printf("[castle] CAMPER %d entered the castle\n", index)
+			ACK_tourist[index] <- 1
+		// Car
+		case index = <-endUphill[CAR]:
+			numCarsOnRoad[UPHILL]--
+			fmt.Printf("[castle] CAR %d entered the castle\n", index)
+			ACK_tourist[index] <- 1
+		// Snowplow
+		case <-endUphill[SNOWPLOW]:
+			snowplowActive = false
+			fmt.Printf("[castle] SNOWPLOW entered the castle\n")
+			ACK_snowplow <- 1
+		case p = <-whenParking((numCampersOnRoad[UPHILL]+numCarsOnRoad[UPHILL] == 0) && (!snowplowActive) && (len(startDownhill[SNOWPLOW]) == 0), startDownhill[CAMPER]):
+			numCampersOnRoad[DOWNHILL]++
+			freeMaxiSpots++
+			fmt.Printf("[castle] CAMPER %d entered downhill direction\n", index)
+			ACK_tourist[p.index] <- 1
+		case p = <-whenParking((numCampersOnRoad[UPHILL] == 0) && (!snowplowActive) && (len(startDownhill[SNOWPLOW])+len(startDownhill[CAMPER]) == 0), startDownhill[CAR]):
+			numCarsOnRoad[DOWNHILL]++
+			if p.parkingType == MAXI {
+				freeMaxiSpots++
+			} else {
+				freeStandardSpots++
+			}
+			fmt.Printf("[castle] CAR %d entered downhill direction\n", index)
+			ACK_tourist[p.index] <- 1
+		case <-whenParking((stop == false) && (numCampersOnRoad[DOWNHILL]+numCarsOnRoad[DOWNHILL]+numCampersOnRoad[UPHILL]+numCarsOnRoad[UPHILL] == 0), startDownhill[SNOWPLOW]):
+			snowplowActive = true
+			fmt.Printf("[castle] SNOWPLOW entered downhill direction\n")
+			ACK_snowplow <- 1
+		case index = <-endDownhill[CAMPER]:
+			numCampersOnRoad[DOWNHILL]--
+			fmt.Printf("[castle] CAMPER %d exited\n", index)
+			ACK_tourist[index] <- 1
+		case index = <-endDownhill[CAR]:
+			numCarsOnRoad[DOWNHILL]--
+			fmt.Printf("[castle] CAR %d exited\n", index)
+			ACK_tourist[index] <- 1
+		case <-endDownhill[SNOWPLOW]:
+			snowplowActive = false
+			fmt.Printf("[castle] SNOWPLOW exited\n")
+			ACK_snowplow <- 1
+		// Termination:
+		case <-terminateSnowplow:
+			stop = true
+			fmt.Printf("[castle] tourists terminated, stopping snowplow...\n")
+		case <-whenParking((stop == true), startDownhill[SNOWPLOW]):
+			ACK_snowplow <- -1
 		case <-terminate:
 			fmt.Printf("[castle] Terminating...\n")
 			done <- true
