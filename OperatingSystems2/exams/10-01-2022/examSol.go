@@ -45,7 +45,7 @@ func sleepRandom() {
 	time.Sleep(time.Duration(1e9 * ((rand.Intn(30)) + 1)))     //Random sleep between 1-30 seconds, you need the 1e9 because it's in nanosecond
 }
 
-//Utility function: conditional channel activation
+//Utility function: conditional channel activation (Logic guard)
 func when(condition bool, ch chan User) chan User {
 	if !condition {
 		return nil // Return nil channel if condition is false
