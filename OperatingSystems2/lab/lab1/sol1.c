@@ -1,5 +1,3 @@
-//  !! GIVEN EXAMPLE FROM UNIVERSITY - ONLY SLIGHT CHANGES !!
-
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
@@ -9,91 +7,98 @@
 #define NUM_THREADS 3
 #define K 2
 
-//Ho bisogno di una SD organizzata così: Ogni thread corrisponde a una persona
-//                                       ogni persona esprime K pareri su K film assegnando un voto 1<=x<=10
-//                                       (il fatto che il nuemro di pareri coincida con il numero di film è puramente incidimentale)
+// We need a data structure organized as follows: Each thread corresponds to a person.
+// Each person gives K opinions on K movies, assigning a rating between 1 and 10.
+// (The fact that the number of opinions matches the number of movies is purely coincidental.)
 
-typedef struct{
-int voti[K];
-char film[K][40];
-int pareri;
-pthread_mutex_t m;
-} sondaggio;
+typedef struct {
+    int ratings[K];
+    char movies[K][40];
+    int opinions_count;
+    pthread_mutex_t mutex;
+} survey;
 
-sondaggio S;
+survey Survey;
 
-//Inizializzazione della "base di dati"=db dei film
-void init(sondaggio *s) {
-	int i;
-	s->pareri=0;
-	for(i=0;i<K; i++)
-	{	printf("Qual è il nome del film numero %d ? ", i+1);
-		scanf("%s",s->film[i]);
-		s->voti[i]=0;
-	}
-	pthread_mutex_init(&s->m, NULL); 
+// Initialize the "database" of movies
+void initialize(survey *s) {
+    int i;
+    s->opinions_count = 0;
+    for (i = 0; i < K; i++) {
+        printf("What is the name of movie number %d? ", i + 1);
+        scanf("%s", s->movies[i]);
+        s->ratings[i] = 0;
+    }
+    pthread_mutex_init(&s->mutex, NULL);
 }
 
-//Funzione sottoposta ad ogni "utente"(thread)
-void esprimi_pareri(sondaggio *s, int th) {         
-  int i, voto;
-  //Chiudi momentaneamente il db per evitare che altri scrivano nel mentre
-  pthread_mutex_lock(&s->m);
-  printf("\n\n COMPILAZIONE QUESTIONARIO per lo Spettatore %d:\n", th); 
-  for(i=0;i<K; i++) {
-		printf("voto del film  %s [0,.. 10]? ", s->film[i]);
-		scanf("%d", &voto);
-		s->voti[i]+=voto;
-	}
-   s->pareri++;
-   printf("FINE QUESTIONARIO per lo spettatore %d\n RISULTATI PARZIALI SONDAGGIO:\n", th);
-   for(i=0;i<K;i++)
-	printf("Valutazione media film %s: %f\n", s->film[i], (float)(s->voti[i])/s->pareri);
-   //Riapri altrimenti facciamo deadlock
-   pthread_mutex_unlock (&s->m);
- }
-
-//Spettatore = thread
-void *spettatore(void *t) {
-	long tid, result=0;
-	tid = (int)t;
-	esprimi_pareri(&S, tid);
-        printf("Spettatore %ld ha compilato i questionari...\n",tid);
-	pthread_exit((void*) result);
+// Function executed by each "user" (thread)
+void submit_opinions(survey *s, int thread_id) {         
+    int i, rating;
+    // Temporarily lock the database to avoid concurrent writes
+    pthread_mutex_lock(&s->mutex);
+    printf("\n\n COMPLETING QUESTIONNAIRE for Viewer %d:\n", thread_id); 
+    for (i = 0; i < K; i++) {
+        printf("Rating for movie %s [0 to 10]? ", s->movies[i]);
+        scanf("%d", &rating);
+        s->ratings[i] += rating;
+    }
+    s->opinions_count++;
+    printf("END OF QUESTIONNAIRE for Viewer %d\n PARTIAL SURVEY RESULTS:\n", thread_id);
+    for (i = 0; i < K; i++) {
+        printf("Average rating for movie %s: %f\n", s->movies[i], (float)(s->ratings[i]) / s->opinions_count);
+    }
+    // Unlock to prevent deadlocks
+    pthread_mutex_unlock(&s->mutex);
 }
 
-//Crea e sincronizza tutti i thread
-int main (int argc, char *argv[]) {
-   pthread_t thread[NUM_THREADS];
-   int rc, i_max;
-   long t;
-   float media, max;
-   void *status;
-   init(&S);
-   //Dopo aver inizializzato il db crea tutti i thread e loro proseguono autonomamente,	
-   for(t=0; t<NUM_THREADS; t++) {
-      rc = pthread_create(&thread[t], NULL, spettatore, (void *)t); 
-      if (rc) {
-         printf("ERRORE: %d\n", rc);
-         exit(-1);  
-      }
-   }
-   //Pertanto va aspettato che tutti terminino e si sincronizzino, altimenti si prosegue senza avere tutti i sondaggi	
-   for(t=0; t<NUM_THREADS; t++) {
-      rc = pthread_join(thread[t], &status);
-      if (rc) 
-          printf("ERRORE join thread %ld codice %d\n", t, rc);
-   }
-   printf("\n\n--- RISULTATI ---\n");
-   i_max=0; max=0;
-   for(t=0; t<K;t++) {
-  		media=(float) S.voti[t]/NUM_THREADS;
-		printf("Valutazione media del film n.%ld (%s): %f\n", t+1, S.film[t], media);
-		if (media>max) {
-			max=media;
-			i_max=t;
-		}
-  }
-  printf("\n\n IL FILM VINCITORE E': %s, con voto %f !\n",  S.film[i_max], max);
-  return 0;
+// Viewer = thread
+void *viewer(void *thread_data) {
+    long thread_id, result = 0;
+    thread_id = (int)thread_data;
+    submit_opinions(&Survey, thread_id);
+    printf("Viewer %ld completed the questionnaire...\n", thread_id);
+    pthread_exit((void *)result);
+}
+
+// Create and synchronize all threads
+int main(int argc, char *argv[]) {
+    pthread_t threads[NUM_THREADS];
+    int return_code, top_movie_index;
+    long thread_id;
+    float average, highest_average;
+    void *status;
+
+    initialize(&Survey);
+
+    // After initializing the database, create all threads to proceed independently
+    for (thread_id = 0; thread_id < NUM_THREADS; thread_id++) {
+        return_code = pthread_create(&threads[thread_id], NULL, viewer, (void *)thread_id); 
+        if (return_code) {
+            printf("ERROR: %d\n", return_code);
+            exit(-1);  
+        }
+    }
+
+    // Wait for all threads to finish to ensure all questionnaires are completed
+    for (thread_id = 0; thread_id < NUM_THREADS; thread_id++) {
+        return_code = pthread_join(threads[thread_id], &status);
+        if (return_code) {
+            printf("ERROR joining thread %ld, code %d\n", thread_id, return_code);
+        }
+    }
+
+    printf("\n\n--- RESULTS ---\n");
+    top_movie_index = 0;
+    highest_average = 0;
+    for (thread_id = 0; thread_id < K; thread_id++) {
+        average = (float)Survey.ratings[thread_id] / NUM_THREADS;
+        printf("Average rating for movie %ld (%s): %f\n", thread_id + 1, Survey.movies[thread_id], average);
+        if (average > highest_average) {
+            highest_average = average;
+            top_movie_index = thread_id;
+        }
+    }
+    printf("\n\n THE WINNING MOVIE IS: %s, with a rating of %f!\n", Survey.movies[top_movie_index], highest_average);
+    return 0;
 }
