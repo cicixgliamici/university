@@ -1,4 +1,4 @@
-# Computer Architecture Summary
+# Computer Architecture 2 Summary
 
 This document provides a concise overview of key concepts related to modern CPU pipelines, cache organization, and coherence protocols.
 
