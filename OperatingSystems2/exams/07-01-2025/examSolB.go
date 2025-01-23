@@ -148,4 +148,183 @@ func trainer(id int) {
         UscitaPT <- req
         <-req.ack
 
-        fmt.Printf("[TRAINER %d]
+        fmt.Printf("[TRAINER %d] has exited...\n", id)
+
+        // Check if we should terminate
+        select {
+        case <-termina:
+            fmt.Printf("[TRAINER %d] done!\n", id)
+            done <- true
+            return
+        default:
+            // Continue if no termination signal
+            sleepRandTime(2)
+        }
+    }
+}
+
+// SERVER GOROUTINE: "palestra" (the gym)
+// Manages all entries (users to weights area or courses area, and trainers) and exits.
+// Maintains state variables about how many users and trainers are inside, and which user
+// is assigned to which trainer.
+func palestra() {
+    utentiInPalestra := 0             // total users in the gym
+    utentiInAP := 0                   // users in the weights area
+    trainer := make([]Trainer, NT)    // state of each trainer
+
+    // Initialize trainer state
+    for i := 0; i < NT; i++ {
+        trainer[i].dentro = false
+        trainer[i].vuoleUscire = false
+        trainer[i].utenteAssegnato = -1
+        trainer[i].ackUscita = nil
+    }
+
+    trainerLiberi := 0   // how many trainers are free (not assigned to a user)
+    trainerDentro := 0   // how many trainers are currently inside the gym
+
+    fmt.Printf("[GYM] Opened!\n")
+
+    for {
+        select {
+        // 1) User entering the WEIGHTS area (AREAPESI)
+        //    Condition: total users < MAX, users in weights area < NP,
+        //    and nobody is waiting to enter the courses area first
+        case r := <-when(utentiInPalestra < MAX && utentiInAP < NP && len(IngressoArea[AREACORSI]) == 0, IngressoArea[AREAPESI]):
+            utentiInPalestra++
+            utentiInAP++
+            fmt.Printf("[GYM] User %d entered the weights area.\n", r.id)
+            r.ack <- true
+
+        // 2) User entering the COURSES area (AREACORSI)
+        //    Condition: total users < MAX, at least 1 free trainer,
+        //    and no trainers waiting to enter (IngressoPT) at the moment
+        case r := <-when(utentiInPalestra < MAX && trainerLiberi > 0 && len(IngressoPT) == 0, IngressoArea[AREACORSI]):
+            utentiInPalestra++
+            // Search for a free trainer
+            found := false
+            i := 0
+            for i = 0; i < NT && !found; i++ {
+                if trainer[i].utenteAssegnato == -1 && trainer[i].dentro {
+                    found = true
+                    trainer[i].utenteAssegnato = r.id // trainer i is assigned to user r.id
+                }
+            }
+            trainerLiberi--
+            fmt.Printf("[GYM] User %d is in the courses area, training with trainer %d.\n", r.id, i)
+            r.ack <- true
+
+        // 3) A trainer requests to enter
+        case r := <-IngressoPT:
+            fmt.Printf("[GYM] Trainer %d entered.\n", r.id)
+            trainer[r.id].dentro = true
+            trainer[r.id].vuoleUscire = false
+            trainer[r.id].utenteAssegnato = -1
+            trainer[r.id].ackUscita = nil
+            trainerDentro++
+            trainerLiberi++
+            r.ack <- true
+
+        // 4) A user requests to exit from either area
+        case r := <-Uscita:
+            utentiInPalestra--
+            fmt.Printf("[GYM] User %d exiting from %s\n", r.id, strings.ToUpper(getTipo(r.tipo)))
+
+            // If exiting from courses area, free up the trainer assigned to that user
+            if r.tipo == AREACORSI {
+                found := false
+                for i := 0; i < NT && !found; i++ {
+                    if trainer[i].utenteAssegnato == r.id {
+                        found = true
+                        trainer[i].utenteAssegnato = -1
+                        trainerLiberi++
+                        // If this trainer wanted to exit but was waiting for the user to finish:
+                        if trainer[i].vuoleUscire && trainer[i].dentro {
+                            fmt.Printf("[GYM] Trainer %d is now allowed to exit the gym...\n", i)
+                            trainer[i].dentro = false
+                            trainer[i].vuoleUscire = false
+                            trainer[i].ackUscita <- true  // let the trainer exit
+                            trainer[i].ackUscita = nil
+                            trainerDentro--
+                            trainerLiberi--
+                        }
+                    }
+                }
+            } else {
+                // Exiting from the weights area
+                utentiInAP--
+            }
+            r.ack <- true
+
+        // 5) A trainer requests to exit
+        case req := <-UscitaPT:
+            fmt.Printf("[GYM] Trainer %d is asking to exit...\n", req.id)
+            if trainer[req.id].utenteAssegnato == -1 {
+                // Trainer is not assigned to any user, can exit right away
+                fmt.Printf("[GYM] Trainer %d is free and is leaving the gym...\n", req.id)
+                trainer[req.id].dentro = false
+                trainer[req.id].vuoleUscire = false
+                trainer[req.id].ackUscita = nil
+                trainerLiberi--
+                trainerDentro--
+                req.ack <- true
+            } else {
+                // Trainer is busy with a user -> must wait
+                fmt.Printf("[GYM] Trainer %d is busy and waits to exit.\n", req.id)
+                trainer[req.id].vuoleUscire = true
+                trainer[req.id].ackUscita = req.ack
+            }
+
+        // 6) The server receives a termination signal
+        case <-terminaServer:
+            fmt.Printf("[GYM] Closing.\n")
+            done <- true
+            return
+        }
+    }
+}
+
+func main() {
+    rand.Seed(time.Now().UnixNano())
+
+    var nUtenti int
+    var nTrainer int
+
+    nUtenti = 50
+    nTrainer = NT
+
+    // Initialize channels for user entry in both areas
+    for i := 0; i < len(IngressoArea); i++ {
+        IngressoArea[i] = make(chan Request, MAXBUFF)
+    }
+
+    // Start the server goroutine (the gym)
+    go palestra()
+
+    // Create trainer goroutines
+    for i := 0; i < nTrainer; i++ {
+        go trainer(i)
+    }
+
+    // Create user goroutines
+    for i := 0; i < nUtenti; i++ {
+        go utente(i)
+    }
+
+    // Wait for all users to finish
+    for i := 0; i < nUtenti; i++ {
+        <-done
+    }
+
+    // Signal all trainers to terminate and wait for them
+    for i := 0; i < nTrainer; i++ {
+        termina <- true
+        <-done
+    }
+
+    // Finally, tell the server to terminate
+    terminaServer <- true
+    <-done
+
+    fmt.Printf("\n\n[MAIN] The gym is closed!\n")
+}
