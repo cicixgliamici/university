@@ -66,20 +66,20 @@ func server(nris int, nproc int) {
 				fmt.Printf("[server] resource %d returned\n", res)
 			} else {                          //Allocate resource to a waiting client
 				for i = 0; i < nproc && !sospesi[i]; i++ {
-				}
 				sospesi[i] = false        //Remove client from waiting list
 				nsosp--
 				risorsa[i] <- res         //Assign resource to the client
+				}
 			}
 		// Handle resource requests
 		case p = <-richiesta:
 			if disponibili > 0 {             //Resources are available
 				for i = 0; i < nris && !libera[i]; i++ {
-				}
 				libera[i] = false        //Mark the resource as allocated
 				disponibili--
 				risorsa[p] <- i          //Send the resource to the client
 				fmt.Printf("[server] allocated resource %d to client %d\n", i, p)
+				}
 			} else {                         //No resources available; client waits
 				nsosp++
 				sospesi[p] = true
