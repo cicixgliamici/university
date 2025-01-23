@@ -42,5 +42,3 @@ This course bridges programming languages and computational models, with a stron
 - **Dynamic Languages**: JavaScript as functional and prototype-based.
 
 ---
-
-Feel free to contribute by adding code, sharing summaries, or suggesting new resources!
