@@ -1,0 +1,6 @@
+tipo := rand.Intn(100)
+		if tipo >= 80 { // la probabilità che l'addetto voglia mascherine miste è inferiore
+			r.tipo = M
+		} else {
+			r.tipo = tipo % 2
+		}
