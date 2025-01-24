@@ -4,3 +4,14 @@ tipo := rand.Intn(100)
 		} else {
 			r.tipo = tipo % 2
 		}
+
+//dentro un for
+select {
+		case <-terminaFornitore:
+			fmt.Printf("[FORNITORE %s] Termino\n", strings.ToUpper(getTipo(t)))
+			done <- true
+			return
+		default:
+			continue
+		}
+
