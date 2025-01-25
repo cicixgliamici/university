@@ -34,7 +34,7 @@ const (
 type Request struct {
 	id   int         // Identificativo di chi fa la richiesta
 	tipo int         // Indica il tipo di risorsa coinvolta
-	ack  chan int    // Canale di ack per segnalare eventi completati
+	ack  chan int    // Canale di ack per segnalare eventi completati, eventualmente può essere di tipo int per ricevere informazioni indietro
 }
 
 // ============================================================
