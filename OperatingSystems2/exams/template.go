@@ -421,7 +421,8 @@ func main() {
 //    - Invio (send):
 //      c <- valore
 //    - Ricezione (receive):
-//      v := <- c
+//      <- c         // se non mi interessa il contenuto, tipicamente gli ack
+//      v := <- c  // se mi interessa il contenuto 
 //      oppure: v, ok := <- c   // dove ok indica se il canale è ancora aperto
 //
 // 3. Cicli (for):
