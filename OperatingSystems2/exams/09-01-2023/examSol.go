@@ -70,20 +70,25 @@ func sleepRandTime(timeLimit int) {
 func tourist(index int, vehicleType int) {
 	var parkingType int
 	sleepRandTime(4)
+
 	startUphill[vehicleType] <- index
 	parkingType = <-ACK_tourist[index]
 	sleepRandTime(3) // Time to go uphill
+
 	endUphill[vehicleType] <- index
 	<-ACK_tourist[index]
+
 	// Visit the castle
 	sleepRandTime(4)
 	p := Parking{index, parkingType}
 	startDownhill[vehicleType] <- p
 	<-ACK_tourist[index]
+
 	sleepRandTime(2)
 	endDownhill[vehicleType] <- index
 	<-ACK_tourist[index]
 	done <- true
+
 	return
 }
 
@@ -93,19 +98,23 @@ func snowplow() {
 	for {
 		startDownhill[SNOWPLOW] <- Parking{-1, -1}
 		res = <-ACK_snowplow
+
 		if res == -1 {
 			fmt.Printf("[snowplow] terminating...\n")
 			done <- true
 			return
 		}
+
 		fmt.Printf("[snowplow] entered downhill direction\n")
 		sleepRandTime(2)
 		endDownhill[SNOWPLOW] <- 1
 		res = <-ACK_snowplow
+
 		sleepRandTime(8)
 		startUphill[SNOWPLOW] <- 1
 		res = <-ACK_snowplow
 		fmt.Printf("[snowplow] entered uphill direction\n")
+
 		sleepRandTime(2)
 		endUphill[SNOWPLOW] <- 1
 		res = <-ACK_snowplow
