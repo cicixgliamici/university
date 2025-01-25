@@ -413,6 +413,7 @@ func main() {
 //      var x int           // dichiaro x di tipo int
 //      x := 10             // dichiarazione e assegnazione implicita del tipo
 //      var y, z = 10, 20   // dichiarazione multipla
+//      x := rand.Intn(10)  // rand.Intn(n) generates a random integer in the range [0, n) (n excluded), if you want n, sum +1
 //
 // 2. Canali:
 //    - Dichiarazione e creazione:
