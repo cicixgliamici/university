@@ -135,14 +135,11 @@ func cliente(id int, tipo int, entra chan Richiesta, esci chan int, termina chan
 
     // Simulate a random initialization time
     sleepRandTime(5)
-
     fmt.Printf("[CLIENT %s %d] I want to enter the shop...\n", tipoClienteStr[tipo], id)
 
     // Send a request to enter
     entra <- ric
-    // Wait for acknowledgment
     <-ric.ack
-
     fmt.Printf("[CLIENT %s %d] I have entered the shop...\n", tipoClienteStr[tipo], id)
 
     // Simulate shopping / being inside
@@ -152,9 +149,8 @@ func cliente(id int, tipo int, entra chan Richiesta, esci chan int, termina chan
     esci <- id
     fmt.Printf("[CLIENT %s %d] I have left the shop...\n", tipoClienteStr[tipo], id)
 
-    fmt.Printf("[CLIENT %s %d] Terminating...\n", tipoClienteStr[tipo], id)
-
     // Signal that this client has finished
+    fmt.Printf("[CLIENT %s %d] Terminating...\n", tipoClienteStr[tipo], id)
     termina <- true
     return
 }
@@ -168,23 +164,18 @@ func commesso(id int, entra chan Richiesta, esci chan Richiesta, termina chan bo
 
     for {
         sleepRandTime(5)
-
         fmt.Printf("[ASSISTANT %d] I want to enter the shop...\n", id)
 
         // Request to enter
         entra <- ric
-        // Wait for ack
         <-ric.ack
 
         fmt.Printf("[ASSISTANT %d] I have entered the shop...\n", id)
-
-        // Simulate working inside
         sleepRandTime(9)
 
         // Request to exit
         esci <- ric
         <-ric.ack
-
         fmt.Printf("[ASSISTANT %d] I have left the shop...\n", id)
 
         // Check if we should terminate
@@ -197,7 +188,6 @@ func commesso(id int, entra chan Richiesta, esci chan Richiesta, termina chan bo
             }
         default:
             {
-                // Not terminating yet, wait a bit
                 sleepRandTime(2)
             }
         }
@@ -209,11 +199,10 @@ func commesso(id int, entra chan Richiesta, esci chan Richiesta, termina chan bo
 func fornitore(deposita chan bool, termina chan bool) {
     for {
         sleepRandTime(5)
-
         fmt.Printf("[SUPPLIER] I want to deliver a batch of masks...\n")
+        
         // Send a signal that we have a batch to deposit
         deposita <- true
-        // Wait for the shop to confirm
         <-deposita
         fmt.Printf("[SUPPLIER] Delivery completed...\n")
 
@@ -227,6 +216,7 @@ func fornitore(deposita chan bool, termina chan bool) {
             }
         default:
             {
+                //Wait and restart the cycle
                 sleepRandTime(2)
             }
         }
@@ -288,7 +278,6 @@ func negozio(
             {
                 mascherine += NM
                 fmt.Printf("[SHOP] The supplier delivered %d masks...\n", NM)
-                // Send ack back to the supplier on the same channel
                 deposita <- true
             }
 
@@ -421,9 +410,7 @@ func negozio(
                             if commessi[i].clientiAssegnati[j] == id {
                                 // Free that slot
                                 commessi[i].clientiAssegnati[j] = -1
-
                                 if commessi[i].numeroClientiAssegnati == 3 {
-                                    // This assistant was at full capacity, now has space
                                     commessiLiberi++
                                 }
                                 commessi[i].numeroClientiAssegnati--
@@ -503,6 +490,7 @@ func main() {
             tipo = OCCASIONALE
             entraCliente = entraClienteOccasionale
         }
+        
         go cliente(i, tipo, entraCliente, esciCliente, terminaCliente)
     }
 
