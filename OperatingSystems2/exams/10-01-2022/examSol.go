@@ -146,12 +146,17 @@ func user(id int) {
 	var ack = make(chan int)
 	var request User
 	request := User{id, userType, serviceType, ack}
+
+	//Entering the waiting room
 	sleepRandom()
 	enterWaitingRoom[userType] <- request
 	<-request.reply
+
+	//Entering in an office
 	enterOffice[serviceType] <- request
 	officeAssigned := <-request.reply
 	sleepRandom()
+	
 	exitOffice <- officeAssigned
 	fmt.Printf("User [%d]: I have exited office %d. Terminating.\n", id, officeAssigned)
 	done <- true
@@ -159,8 +164,11 @@ func user(id int) {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+
+	//Makings channels
 	terminate = make(chan bool)
 	done = make(chan bool)
+	
 	for i := 0; i < USER_TYPES; i++ {
 		enterWaitingRoom[i] = make(chan User, MAX_BUFFER)
 	}
@@ -168,10 +176,14 @@ func main() {
 		enterOffice[i] = make(chan User, MAX_BUFFER)
 	}
 	exitOffice = make(chan int, MAX_BUFFER)
+
+	//Making goroutine
 	go server()
 	for id := 0; id < NUM_USERS; id++ {
 		go user(id)
 	}
+
+	//Join goroutine
 	for id := 0; id < NUM_USERS; id++ {
 		<-done
 	}
