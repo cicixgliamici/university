@@ -31,7 +31,8 @@ var endUphill [3]chan int
 var startDownhill [3]chan Parking
 var endDownhill [3]chan int
 
-// Acknowledgment channels
+// Acknowledgment channels, si fa cosi solo quando serve effettivamente l'informazione mandata 
+// dal server all'interno dell'ack
 var ACK_tourist [NUM_TOURISTS]chan int
 var ACK_snowplow = make(chan int, MAXBUFF)
 
