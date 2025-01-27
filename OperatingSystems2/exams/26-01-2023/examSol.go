@@ -33,6 +33,8 @@ var start_request [2]chan request // Buffered channels for starting requests (in
 var end_request = make(chan request, MAX_BUFFER) // Buffered channel for ending requests
 
 // Channels for operator actions
+// start refill is buffered because the operator can request multiple refills.
+// terminate Operator is not buffered to ensure synchronous handshake.
 var start_refill = make(chan int, MAX_BUFFER)    // Operator starts refill
 var end_refill = make(chan int, MAX_BUFFER)      // Operator ends refill
 var ack_operator = make(chan int, MAX_BUFFER)    // Acknowledgment for operator
