@@ -325,11 +325,10 @@ func negozio(
         //      - No one is queued in entraCommesso
         //      - The queue for occasional clients does not have priority
         case ric := <-whenRichiesta(
-            commessiDentro > 0 && commessiLiberi > 0 && mascherine >= 1 &&
-                len(entraCommesso) == 0 &&
-                (clientiDentro+commessiDentro < MAX),
-            entraClienteAbituale,
-        ):
+                      commessiDentro > 0 && commessiLiberi > 0 && mascherine >= 1 &&
+                      len(entraCommesso) == 0 &&
+                      (clientiDentro+commessiDentro < MAX),
+                      entraClienteAbituale):
             {
                 found := false
                 // Search for a free assistant with <3 assigned clients
@@ -367,11 +366,10 @@ func negozio(
         //      - The shop is not full
         //      - No one is queued in entraCommesso
         case ric := <-whenRichiesta(
-            len(entraClienteAbituale) == 0 && commessiDentro > 0 && commessiLiberi > 0 && mascherine >= 1 &&
-                len(entraCommesso) == 0 &&
-                (clientiDentro+commessiDentro < MAX),
-            entraClienteOccasionale,
-        ):
+                      len(entraClienteAbituale) == 0 && commessiDentro > 0 && commessiLiberi > 0 && mascherine >= 1 &&
+                      len(entraCommesso) == 0 &&
+                      (clientiDentro+commessiDentro < MAX),
+                      entraClienteOccasionale):
             {
                 found := false
                 // Search for a free assistant
