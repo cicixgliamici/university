@@ -138,7 +138,7 @@ func bridgeManager() {
 		case req := <-when(
 			state == bridgeDown && 
 			((vehiclesOnBridge > 0 && vehiclesOnBridge < MAX_VEHICLE_CAPACITY && direction == northToSouth) || 
-			 (vehiclesOnBridge == 0 && direction == southToNorth)) && 
+			(vehiclesOnBridge == 0 && direction == southToNorth)) && 
 			len(bridgeBoatCh[BOAT_ENTER]) == 0, 
 			bridgeVehicleInCh[PUBLIC_NORTH]):
 			// Handle public service vehicles with priority
@@ -153,7 +153,7 @@ func bridgeManager() {
 		case req := <-when(
 			state == bridgeDown && 
 			((vehiclesOnBridge > 0 && vehiclesOnBridge < MAX_VEHICLE_CAPACITY && direction == southToNorth) || 
-			 (vehiclesOnBridge == 0 && direction == northToSouth)) && 
+			(vehiclesOnBridge == 0 && direction == northToSouth)) && 
 			len(bridgeBoatCh[BOAT_ENTER]) == 0, 
 			bridgeVehicleInCh[PUBLIC_SOUTH]):
 			if direction == northToSouth {
@@ -162,16 +162,6 @@ func bridgeManager() {
 			vehiclesOnBridge++
 			fmt.Printf("\n[Bridge] Public Vehicle %d S->N\tState: %d\tVehicles: %d", req.id, state, vehiclesOnBridge)
 			req.ack <- 1
-
-		// Private vehicle handling
-		case req := <-when(
-			state == bridgeDown && 
-			len(bridgeBoatCh[BOAT_ENTER]) == 0 && 
-			len(bridgeVehicleInCh[PUBLIC_SOUTH]) == 0 && 
-			len(bridgeVehicleInCh[PUBLIC_NORTH]) == 0, 
-			bridgeVehicleInCh[VEHICLE_NORTH]):
-			// Similar logic for private vehicles
-			// ...
 
 		// Vehicle exit handling
 		case req := <-bridgeVehicleOutCh:
