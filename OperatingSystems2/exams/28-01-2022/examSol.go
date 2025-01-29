@@ -83,6 +83,7 @@ func AR(id int) {
 	for i := 0; i < cycles; i++ {                                               
 		tipo := rand.Intn(3)                                                      
 		r.tipo = tipo
+		
 		if tipo == T_MIX {
 			fmt.Printf("[Worker %d] requesting a mixed batch\n", id)
 		} else if tipo == T_FFP2 {
@@ -90,9 +91,12 @@ func AR(id int) {
 		} else {
 			fmt.Printf("[Worker %d] requesting a surgical mask batch\n", id)
 		}
+		
 		startwithdrawal[tipo] <- r                                                  //Start a request and wait for the synchronization
 		<-r.ack                                                                     //Waiting for the acknowledgement 
+		
 		sleep(10)                                                                   //Time to process the withdrawal
+		
 		endwithdrawal <- r                                                          //Notify end of withdrawal
 		<-r.ack
 	}
@@ -114,11 +118,13 @@ func supplier(tipo int) {
 		startDelivery[tipo] <- r                                                            //No need for synchronization
 		flag := <-r.ack                                                                     //But need to know if he have to stop
 		sleep(20)                                                                           //Time to restock the shelf
+		
 		if flag == 0 {                                                                      //Supplier needs to terminate
 			doneTask <- true
 			fmt.Printf("[Supplier %d] finished!\n", tipo)
 			return
 		}
+		
 		endDelivery <- r
 		<-r.ack
 		fmt.Printf("[Supplier %d] finished restocking the shelf for mask type %d\n", tipo, tipo)
