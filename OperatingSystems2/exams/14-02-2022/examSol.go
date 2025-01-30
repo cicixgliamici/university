@@ -97,12 +97,12 @@ func server() {
         //   - No pending school groups or supervisors or single visitors waiting to enter the corridor OUT
         case x := <-when(
             scolaresche_in_C[OUT] == 0 &&
-                (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
-                persone_in_sala < N &&
-                sorveglianti_in_sala < MaxS &&
-                (len(entrataC_OUT[SCOL])+len(entrataC_OUT[SORV])+len(entrataC_OUT[SING]) == 0),
-            entrataC_IN[SORV],
-        ):
+            (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
+            persone_in_sala < N &&
+            sorveglianti_in_sala < MaxS &&
+            (len(entrataC_OUT[SCOL])+len(entrataC_OUT[SORV])+len(entrataC_OUT[SING]) == 0),
+            entrataC_IN[SORV]):
+            
             persone_in_C[IN]++
             persone_in_sala++
             sorveglianti_in_sala++
@@ -117,12 +117,12 @@ func server() {
         //   - No supervisors waiting in the IN corridor or anything else in the OUT corridor with higher priority
         case x := <-when(
             scolaresche_in_C[OUT] == 0 &&
-                (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
-                persone_in_sala < N &&
-                sorveglianti_in_sala > 0 &&
-                (len(entrataC_IN[SORV])+len(entrataC_OUT[SCOL])+len(entrataC_OUT[SORV])+len(entrataC_OUT[SING]) == 0),
-            entrataC_IN[SING],
-        ):
+            (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
+            persone_in_sala < N &&
+            sorveglianti_in_sala > 0 &&  
+            (len(entrataC_IN[SORV])+len(entrataC_OUT[SCOL])+len(entrataC_OUT[SORV])+len(entrataC_OUT[SING]) == 0),
+            entrataC_IN[SING]):
+            
             persone_in_C[IN]++
             persone_in_sala++
             x.ack <- 1
@@ -140,8 +140,8 @@ func server() {
                 persone_in_sala+scolari <= N &&
                 sorveglianti_in_sala > 0 &&
                 (len(entrataC_IN[SORV])+len(entrataC_IN[SING])+len(entrataC_OUT[SCOL])+len(entrataC_OUT[SORV])+len(entrataC_OUT[SING]) == 0),
-            entrataC_IN[SCOL],
-        ):
+            entrataC_IN[SCOL]):
+            
             persone_in_C[IN] += scolari
             scolaresche_in_C[IN]++
             persone_in_sala += scolari
@@ -160,8 +160,8 @@ func server() {
                 (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
                 (sorveglianti_in_sala > 1 || persone_in_sala == 1) &&
                 (len(entrataC_OUT[SCOL])+len(entrataC_OUT[SING]) == 0),
-            entrataC_OUT[SORV],
-        ):
+            entrataC_OUT[SORV]):
+            
             persone_in_C[OUT]++
             persone_in_sala--
             sorveglianti_in_sala--
@@ -176,8 +176,8 @@ func server() {
             scolaresche_in_C[IN] == 0 &&
                 (persone_in_C[IN]+persone_in_C[OUT]) < NC &&
                 (len(entrataC_OUT[SCOL]) == 0),
-            entrataC_OUT[SING],
-        ):
+            entrataC_OUT[SING]):
+            
             persone_in_C[OUT]++
             persone_in_sala--
             x.ack <- 1
@@ -189,8 +189,8 @@ func server() {
         case x := <-when(
             persone_in_C[IN] == 0 &&
                 (persone_in_C[IN]+persone_in_C[OUT])+scolari <= NC,
-            entrataC_OUT[SCOL],
-        ):
+            entrataC_OUT[SCOL]):
+            
             persone_in_C[OUT] += scolari
             scolaresche_in_C[OUT]++
             persone_in_sala -= scolari
