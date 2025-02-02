@@ -369,12 +369,3 @@ KEY SYSTEM LOGIC:
 3. Wait for snowplow confirmation
 4. Terminate castle
 5. Confirm full shutdown
-
-TYPICAL EXAM SCENARIO:
-Question: "Add emergency vehicle priority that can interrupt all traffic"
-Solution:
-- Add new vehicle type constant EMERGENCY
-- Modify when() conditions to allow emergency vehicles through
-- Add priority channel handling in castle's select
-- Implement preemption logic for existing vehicles
-*/
