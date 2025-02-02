@@ -1,11 +1,8 @@
-````markdown
 # RISC-V Floating Point Extension: Educational Example
+# This RISC-V assembly example demonstrates the use of the floating point (F) extension. The code performs basic floating point operations such as addition, subtraction, multiplication, division, as well as conversions between integer and floating point values. These operations are crucial for scientific computing, graphics, signal processing, and any application requiring real-number computations.
+# Below is the complete code with detailed comments:
 
-This RISC-V assembly example demonstrates the use of the floating point (F) extension. The code performs basic floating point operations such as addition, subtraction, multiplication, division, as well as conversions between integer and floating point values. These operations are crucial for scientific computing, graphics, signal processing, and any application requiring real-number computations.
 
-Below is the complete code with detailed comments:
-
-```riscv
     .section .data
 # Define floating point constants and an integer value in the data section.
 float1:    .float 1.5       # Single-precision float constant (1.5)
@@ -88,14 +85,10 @@ main:
     li     a7, 93         # Load syscall number for exit (93) into a7.
     li     a0, 0          # Set exit code 0 (successful termination) in a0.
     ecall                 # Make the system call to exit.
-```
 
-### Importance of the Floating Point Extension
-- **Precision and Range:** The F extension provides hardware support for single-precision floating point arithmetic, enabling calculations with fractional numbers and a wide range of magnitudes.
-- **Performance:** Hardware acceleration of floating point operations significantly speeds up computation compared to software emulation.
-- **Scientific and Engineering Applications:** Many algorithms in science, engineering, and graphics rely on efficient floating point arithmetic.
-- **Standard Compliance:** The RISC-V F extension follows IEEE 754 standards, ensuring consistency and portability of floating point computations across different platforms.
 
-This example serves as a basic educational introduction to using RISC-V's floating point instructions. Experimenting with these operations is essential for understanding how modern processors handle real-number arithmetic efficiently.
-``` 
-````
+# Importance of the Floating Point Extension
+# Precision and Range: The F extension provides hardware support for single-precision floating point arithmetic, enabling calculations with fractional numbers and a wide range of magnitudes.
+# Performance: Hardware acceleration of floating point operations significantly speeds up computation compared to software emulation.
+# Scientific and Engineering Applications: Many algorithms in science, engineering, and graphics rely on efficient floating point arithmetic.
+# Standard Compliance: The RISC-V F extension follows IEEE 754 standards, ensuring consistency and portability of floating point computations across different platforms.
