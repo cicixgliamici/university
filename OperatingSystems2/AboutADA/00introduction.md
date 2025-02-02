@@ -1,4 +1,3 @@
-````markdown
 # Ada Language Fundamentals: Type System and Concurrency Model
 
 This document provides an overview of key features in Ada, focusing on its strong static type system and built-in support for concurrency. Ada is designed with reliability and safety in mind, making it a preferred language for critical systems. In this guide, we'll explore Ada's type system, concurrency model, and design philosophy with illustrative code examples.
@@ -221,4 +220,3 @@ end Contract_Example;
 This overview of Ada's type system and concurrency model illustrates how the language's robust design principles contribute to building safe, maintainable, and concurrent systems. Ada's emphasis on strong typing, explicit concurrency control, and design by contract makes it a powerful tool for developing critical software systems.
 
 Happy coding in Ada!
-````
