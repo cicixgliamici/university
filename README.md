@@ -8,6 +8,8 @@ This repository contains code and study materials related to **Computer Science 
 - [Computer Architecture 2](#advanced-computer-architecture)
 - [Operating Systems 2](#advanced-operating-systems)
 - [Programming Languages and Computational Models](#programming-languages-and-computational-models)
+- [Operations Research](#operations-research)
+- [Software System Engineering](#software-system-engineering)
 
 ## Guides & Lookup Tables
 
@@ -22,13 +24,10 @@ This repository contains code and study materials related to **Computer Science 
 [This course](ComputerArchitecture2) provides advanced knowledge in computer architecture, focusing on high-performance systems. Topics covered include:
 
 - **Instruction-Level Parallelism**: Blocking and non-blocking execution models.
-- **RISC-V Instruction Set Architecture**: Modern, streamlined instruction set for RISC systems.
+- **RISC-V Instruction Set Architecture**: Modern, streamlined instruction set for RISC systems and some extensions.
 - **Memory Hierarchy**: Cache, RAM, and advanced memory architectures.
 - **Data-Level Parallelism**: Vector extensions and processing for large datasets.
-- **Multi/Many-Core Systems**: Architectures with multiple processing units.
 - **Architectural Extensions**: Security features and power management techniques.
-
-These concepts build on foundational knowledge such as register-memory instruction sets, 5-stage RISC pipelines, and I/O management.
 
 ## Operating Systems 2
 
@@ -49,5 +48,22 @@ These concepts build on foundational knowledge such as register-memory instructi
 - **Functional Programming**: Recursion, Lambda calculus, and evaluation models.
 - **Multi-Paradigm Programming**: Scala and Kotlin as multi-paradigm languages.
 - **Dynamic Languages**: JavaScript as functional and prototype-based.
+
+## Operations Research
+
+[This course](OperationsResearch) combines mathematical optimization and discrete simulation methods. Key topics:
+- **Linear Programming**: Simplex algorithm, duality theory, sensitivity analysis  
+- **Integer Programming**: Branch-and-bound, Gomory cuts, 0-1 Knapsack  
+- **Complexity Theory**: P/NP classes, dynamic programming, NP-completeness  
+- **Discrete Simulation**: Event-driven modeling, entity classification, system dynamics
+
+## Software System Engineering 
+
+[This course](SoftwareSystemsEngineering) focuses on modern software architectures and DevOps practices:
+- **Agile Development**: SCRUM methodologies, CI/CD pipelines, Docker/Gradle  
+- **Architectural Styles**: Microservices, event-driven systems, IoT integration  
+- **Distributed Systems**: Message protocols (HTTP/MQTT), DDR robots, AI-IoT convergence  
+- **MDSD Tools**: DSL design, IntelliJ/Eclipse plugins, automated code generation
+
 
 ---
