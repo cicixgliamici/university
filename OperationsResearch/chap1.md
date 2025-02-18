@@ -1,78 +1,89 @@
-# Summary of Core Formulas in Operations Research
+# Summary of Chapter 1: Introduction to Operations Research
 
-## Introduction
+## **1. Overview of Operations Research (OR)**
+- **Definition**: Application of scientific methods to decision-making problems in organizations, aiming to optimize resource management and coordination.
+- **Evolution**: Transition from intuition-based decisions to mathematical methodologies post-WWII.
+- **Key Objective**: Improve efficiency in industries, logistics, healthcare, military, etc., through structured models and algorithms.
 
-Operations Research (OR) applies mathematical models to support decision-making in complex systems. The field relies on various techniques—including linear programming, integer programming, and queueing theory—to optimize performance and resource allocation. This summary outlines several key formulas and modeling approaches common to OR.
+---
 
-## Linear Programming
+## **2. Foundational Concepts**
+### **Decision-Making & Game Theory**
+- **Ice Cream Vendor Problem**: Nash equilibrium example where vendors position carts at the center of a beach to maximize coverage.
+- **Prisoner’s Dilemma**: Demonstrates non-cooperative equilibrium; highlights conflict between individual and collective rationality.
+- **Real-World Analogues**: Political positioning, nuclear arms race (Cold War).
 
-A classic example in production planning is modeled as a linear programming (LP) problem. Consider the following formulation:
+### **Scientific Method in OR**
+- **Deductive Approach** (Popper): Develop models → derive predictions → test validity.
+- **Model Criteria**: Predictive power and falsifiability.
+- **Historical Context**: Galileo’s experiments, atomic models (Thomson, Rutherford, Bohr).
 
-**Objective Function:**
+---
 
-$$
-\max z = 30x_1 + 50x_2
-$$
+## **3. Systems and Models**
+- **System**: Composite of interacting elements requiring coordination.
+- **Model Types**:
+  - **Analytical** (equations with closed-form solutions).
+  - **Numerical** (linear programming, simulation).
+  - **Static vs. Dynamic** (time-dependent systems).
 
-**Constraints:**
+### **Historical Origins**
+- **Ancient**: Sun Tzu’s *The Art of War* (strategy/tactics).
+- **Mathematical Foundations**: Euler (Graph Theory), Lagrange (optimization), Jacobi (Hungarian algorithm).
 
-$$
-\begin{aligned}
-x_1 &\leq 4 \\
-2x_2 &\leq 10 \\
-3x_1 + 2x_2 &\leq 18 \\
-x_1, \; x_2 &\geq 0
-\end{aligned}
-$$
+---
 
-This LP model optimizes profit while ensuring that production does not exceed available capacities.
+## **4. Modern OR Origins**
+- **Western WWII Context**:
+  - Radar allocation problems (Blackett’s team).
+  - Success in Battle of Britain, logistics, and bombing strategies.
+- **Soviet Contributions**:
+  - Kantorovich’s Linear Programming (LP) for production optimization.
+  - Siege of Leningrad logistics (optimal truck spacing on ice).
+- **Post-War Growth**: RAND Project, von Neumann’s influence, computer advancements.
 
-## Queueing Theory
+---
 
-For a single-server queue (commonly referred to as an M/M/1 queue) with arrival rate \(\lambda\) and service rate \(\mu\) (where \(\lambda < \mu\)), the average waiting time \(W\) in the system is given by:
+## **5. Key OR Models & Techniques**
+### **Linear Programming (LP)**
+- **Production Planning Example**:
+  - Maximize profit: \( \max \, 30x_1 + 50x_2 \).
+  - Constraints: Capacity limits (\( x_1 \leq 4 \), \( 2x_2 \leq 10 \), etc.).
+- **Applications**: Logistics, finance, healthcare.
 
-$$
-W = \frac{\lambda}{\mu (\mu - \lambda)}
-$$
+### **Integer Linear Programming (ILP)**
+- **Assignment Problem**: Minimize total time for duty allocation.
+  - Model: Binary variables \( x_{ij} \), constraints for one-to-one assignments.
+  - Complexity: \( 20! \) solutions → solved efficiently via algorithms (e.g., Hungarian method).
 
-This formula helps in assessing the performance of service processes under steady-state conditions.
+### **Graph Theory**
+- **Optimal Tours (TSP)**: Minimize delivery time for depot-to-clients routes.
+- **Shortest/Longest Path Problems**: Applied in transportation, telecommunications, biology.
+- **Applications**: 5–20% cost savings in freight logistics.
 
-## Assignment Problem Model
+---
 
-The assignment problem involves assigning \(n\) tasks to \(n\) candidates with the goal of minimizing total cost or time. It is modeled with decision variables \(x_{ij}\) defined as follows:
+## **6. OR Methodology**
+- **Steps**:
+  1. **Problem Formulation** (e.g., reduce office costs while maintaining service quality).
+  2. **System Analysis**: Collect data (arrival rate \( \lambda \), service rate \( \mu \)).
+  3. **Model Development**: Queueing theory, simulation.
+  4. **Testing & Validation**: Compare predictions with real data.
+  5. **Solution Implementation**: Monitor and revise as needed.
 
-$$
-x_{ij} =
-\begin{cases}
-1, & \text{if candidate } i \text{ is assigned to task } j \\
-0, & \text{otherwise}
-\end{cases}
-$$
+---
 
-**Objective Function:**
+## **7. Applications & Tools**
+- **Domains**: Facility location, telecommunications, military logistics, supply chain.
+- **Common Tools**:
+  - LP/ILP, Graph Theory (PERT-CPM), Simulation.
+- **Industry Impact**: 10–25% cost reduction in transportation, optimized production schedules.
 
-$$
-\min \sum_{i=1}^{n} \sum_{j=1}^{n} t_{ij} x_{ij}
-$$
+---
 
-**Constraints:**
-
-$$
-\begin{aligned}
-\sum_{i=1}^{n} x_{ij} &= 1 \quad \text{for each task } j \\
-\sum_{j=1}^{n} x_{ij} &= 1 \quad \text{for each candidate } i \\
-x_{ij} &\in \{0, 1\} \quad \text{for all } i, j
-\end{aligned}
-$$
-
-This ensures that each task is assigned to exactly one candidate and vice versa, optimizing the overall assignment based on the cost matrix \(T = (t_{ij})\).
-
-## Modeling Framework
-
-The general process of developing an OR model typically involves these steps:
-
-- **Problem Definition:** Clearly identify the decision-making issue.
-- **System Analysis:** Gather data such as arrival rates (\(\lambda\)) and service rates (\(\mu\)) for queueing systems, or resource constraints for production systems.
-- **Model Formulation:** Develop a mathematical representation using appropriate techniques (e.g., LP, ILP, or simulation).
-- **Solution and Testing:** Apply algorithms (e.g., Simplex, branch-and-bound) to solve the model and validate predictions against real data.
-- **Implementation:** Execute the solution in practice and monitor performance for necessary adjustments.
+## **8. Course Syllabus**
+- **Core Topics**:
+  - Linear/non-linear programming, simplex algorithm.
+  - Duality theory, integer programming.
+  - Graph theory (shortest paths, network flows).
+  - Discrete simulation, metaheuristics.
