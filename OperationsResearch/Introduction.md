@@ -48,5 +48,3 @@ OR is applied across various sectors:
 Common tools include:
 1. Software packages like CPLEX or Gurobi for solving large-scale optimization problems efficiently.
 2. Excel Solver or similar spreadsheet tools for smaller-scale optimizations.
-
-This overview provides a broad understanding of the core concepts and applications within the field of Operations Research without focusing on any specific course content from Bologna University's curriculum.
