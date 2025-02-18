@@ -10,9 +10,9 @@ A classic example in production planning is modeled as a linear programming (LP)
 
 **Objective Function:**
 
-\[
+$$
 \max z = 30x_1 + 50x_2
-\]
+$$
 
 **Constraints:**
 
