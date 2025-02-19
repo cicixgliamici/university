@@ -53,6 +53,6 @@
 
 | Rule Name       | Formula                                                  |
 |-----------------|----------------------------------------------------------|
-| Product Rule    | $ (fg)' = f'g + fg' $                                  |
-| Quotient Rule   | $ \left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^2} $   |
-| Chain Rule      | $ \frac{d}{dx}[f(g(x))] = f'(g(x)) \cdot g'(x) $         |
+| Product Rule    | $(fg)' = f'g + fg'$                                  |
+| Quotient Rule   | $\left(\frac{f}{g}\right)' = \frac{f'g - fg'}{g^2}$   |
+| Chain Rule      | $\frac{d}{dx}[f(g(x))] = f'(g(x)) \cdot g'(x)$         |
