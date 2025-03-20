@@ -46,7 +46,7 @@ A **protection mechanism** is the technical implementation enforcing a policy. E
 | **Pros**                          | **Cons**                          |
 |-----------------------------------|-----------------------------------|
 | User autonomy                     | Prone to the "confused deputy" problem |
-| Simple implementation            | No centralized control            |
+| Simple implementation             | No centralized control            |
 | Widely adopted (e.g., Windows NTFS)| Risk of privilege escalation      |
 
 ---
@@ -68,7 +68,7 @@ A **protection mechanism** is the technical implementation enforcing a policy. E
 | **Pros**                          | **Cons**                          |
 |-----------------------------------|-----------------------------------|
 | Prevents privilege escalation     | Inflexible for dynamic environments |
-| Strong isolation (e.g., military)| Complex configuration            |
+| Strong isolation (e.g., military)  | Complex configuration            |
 | Auditable                         | Requires administrative overhead |
 
 ---
@@ -123,3 +123,49 @@ A **protection mechanism** is the technical implementation enforcing a policy. E
 - **MAC** offers strict control but lacks flexibility.
 - **RBAC** balances scalability and structure, ideal for organizations.
 - Modern systems (e.g., cloud platforms) often combine **DAC + RBAC** with **MAC-like** isolation (e.g., containers).
+
+---
+
+## 8. Additional Models and Formal Frameworks
+
+### Graham-Denning Model
+The **Graham-Denning Model** is a formal model for access control that focuses on the secure creation, deletion, and transfer of access rights between subjects and objects.  
+- **Core Concepts**:
+  - **Secure Creation and Deletion**: Ensures that subjects and objects are created and removed securely.
+  - **Rights Transfer**: Describes rules for how rights can be securely transferred between entities.
+- **Purpose**:
+  - This model helps to define a set of operations (such as creating or deleting subjects/objects and transferring rights) that ensure the system maintains its security properties over time.
+- **Significance**:
+  - It provides a structured approach for designing systems that require fine-grained control over the propagation and revocation of permissions.
+
+### HRU Model (Harrison-Ruzzo-Ullman)
+The **HRU Model** is a seminal formal model for access control proposed by Harrison, Ruzzo, and Ullman.  
+- **Core Concepts**:
+  - **Access Matrix**: A theoretical structure that represents the rights each subject has over each object.
+  - **State Transitions**: Defines how the system state (i.e., the access matrix) changes with operations like granting, revoking, and creating rights.
+- **Purpose**:
+  - The model was introduced to analyze the safety problem in access control systems, determining whether a subject can eventually gain a particular access right.
+- **Significance**:
+  - Despite its theoretical complexity, the HRU model forms the foundation for understanding dynamic permission changes and has influenced the design of modern access control mechanisms.
+
+### Biba Model
+The **Biba Model** is a formal model focused on preserving the integrity of data.  
+- **Core Concepts**:
+  - **Integrity Levels**: Subjects and objects are assigned levels of integrity.
+  - **Simple Integrity Property**: A subject at a given integrity level should not read data from a lower integrity level (to prevent contamination).
+  - **Integrity *-Property**: A subject should not write information to a higher integrity level (to prevent the spread of potentially tainted data).
+- **Purpose**:
+  - It is used primarily in environments where the integrity of data is critical, such as financial systems and safety-critical applications.
+- **Significance**:
+  - The model is the inverse of confidentiality models; while confidentiality models like Bell-LaPadula protect data from unauthorized disclosure, Biba ensures data is not improperly modified.
+
+### Bell-LaPadula Model
+The **Bell-LaPadula Model** is a formal model designed to enforce confidentiality.  
+- **Core Concepts**:
+  - **Security Levels**: Both subjects and objects are assigned security classifications (e.g., Unclassified, Confidential, Secret, Top Secret).
+  - **Simple Security Property (No Read Up)**: A subject cannot read data at a higher security level than its own.
+  - **Star Property (No Write Down)**: A subject cannot write data to a lower security level than its own.
+- **Purpose**:
+  - The model aims to prevent unauthorized disclosure of information, making it suitable for military and governmental applications where data confidentiality is paramount.
+- **Significance**:
+  - Bell-LaPadula is one of the most influential models in the field of computer security, forming the basis for many modern secure systems by ensuring that sensitive information does not leak to lower classification levels.
