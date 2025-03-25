@@ -56,6 +56,9 @@ In the message passing model, processes communicate by explicitly sending and re
 | **Performance**        | High performance when well-managed locally         | May suffer from network or communication overhead   |
 | **Complexity**         | High, due to intricate synchronization management   | Complexity lies in designing robust communication protocols |
 
+
+
+
 ## Conclusion
 
 Both the shared memory and message passing models have their merits and challenges:
