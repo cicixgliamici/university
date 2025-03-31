@@ -32,6 +32,7 @@ MPI consists of a set of functions and routines that support various communicati
 
 In C, MPI programs start by initializing the MPI environment and end by finalizing it. Below is an example of a simple MPI program written in C. Notice that code blocks are indicated using four spaces for each line.
 
+```c
     #include <mpi.h>
     #include <stdio.h>
     
@@ -55,6 +56,7 @@ In C, MPI programs start by initializing the MPI environment and end by finalizi
     
         return 0;
     }
+```
 
 ### Explanation of the Example
 
