@@ -123,9 +123,7 @@ Modern CPUs use **protection rings** to enforce privilege levels:
 **Virtualization Extensions**:
 - Intel VT-x and AMD-V introduce **Ring -1** (hypervisor mode) for the VMM.
 - Guest OS runs in Ring 0 (deprivileged) while the hypervisor manages Ring -1.
-
-![Protection Rings](https://i.imgur.com/8ZzQ4fL.png) *Conceptual diagram of privilege levels*
-
+- 
 ---
 
 ### Trap-and-Emulate Mechanism
